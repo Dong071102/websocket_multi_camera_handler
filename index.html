@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Camera Stream</title>
+</head>
+
+<body>
+    <img id="videoFeed" style="max-width: 640px;">
+    <script>
+        const ws = new WebSocket('ws://localhost:8765/cam_1');
+
+        ws.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'video_frame') {
+                document.getElementById('videoFeed').src =
+                    'data:image/jpeg;base64,' + data.frame;
+            } else if (data.type === 'welcome' || data.type === 'error') {
+                console.log(data.message);
+            }
+        };
+
+        ws.onopen = function () {
+            console.log('Connected to server');
+        };
+
+        ws.onclose = function () {
+            console.log('Disconnected from server');
+        };
+    </script>
+</body>
+
+</html>
